@@ -34,10 +34,12 @@ body {
 .container {
     flex: 1;
     padding: 40px;
+    padding-top: 10%;
     display: flex;
     flex-direction: column;
     justify-content: center;
     max-width: 50%;
+    height: 100vh;
     margin: auto;
     transform: translateY(-100px);
 }
@@ -70,6 +72,8 @@ h1 {
     display: flex;
     flex-direction: column;
     gap: 15px;
+    padding-right: 10%;
+    padding-left: 10%;
 }
 
 input[type="email"],
@@ -90,11 +94,20 @@ input[type="password"] {
     border-radius: 30px;
     padding: 12px;
     font-size: 18px;
+    width: 50%;
+    position: relative;
+    left: 25%;
     cursor: pointer;
 }
 
 .btn:hover {
     background: #8b2220;
+}
+.signin-link {
+    color: #a92a28;
+    font-weight: bold;
+    text-decoration: none;
+    padding-left: 10%;
 }
 
 @media (max-width: 1024px) {
