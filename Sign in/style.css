@@ -21,7 +21,7 @@ body {
 .image-side {
     flex: 1;
     display: flex;
-    height: 127vh;
+    height: 100vh;
     
 }
 
@@ -38,7 +38,7 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    max-width: 600px;
+    max-width: 50%;
     margin: auto;
     transform: translateY(-100px); /* Moves everything up */
 }
