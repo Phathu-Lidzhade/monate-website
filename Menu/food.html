@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Food Details</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top-header">
+    <div class="logo">
+      <img src="img/logo 2.png" alt="Monate Logo">
+    </div>
+    <nav class="nav-links">
+      <a href="index.html">HOME</a>
+      <a href="#">ABOUT US</a>
+    </nav>
+    <div class="account-cart">
+      <div class="account">
+        <img src="img/profile.png" alt="Account">
+        <span>ACCOUNT</span>
+      </div>
+      <div class="divider"></div>
+      <div class="cart">
+        <img src="img/shopping cart.png" alt="Cart">
+      </div>
+    </div>
+  </header>
+
+  <main class="content">
+    <a href="index.html" class="back-btn">⬅ Back</a>
+
+    <div class="food-detail">
+      <div class="food-img">
+        <img id="foodImg" src="" alt="">
+      </div>
+      <div class="food-info">
+        <h2 id="foodName"></h2>
+        <p id="foodPrice"></p>
+        <p>Description:</p>
+        <div class="quantity">
+          <button>-</button>
+          <span>1</span>
+          <button>+</button>
+        </div>
+        <button class="add-cart">ADD TO CART</button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const food = JSON.parse(localStorage.getItem("foodItem"));
+    if(food){
+      document.getElementById("foodImg").src = food.img;
+      document.getElementById("foodName").textContent = food.name;
+      document.getElementById("foodPrice").textContent = food.price;
+    }
+  </script>
+</body>
+</html>
