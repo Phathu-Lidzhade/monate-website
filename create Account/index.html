@@ -20,20 +20,20 @@
 
             <h1>Create Account</h1>
 
-            <form class="form">
-                <input type="text" placeholder="Username" required>
-                <input type="email" placeholder="Email Address" required>
-                <input type="tel" placeholder="Mobile Number" required>
+            <form class="form" action="/includes/formhandler.inc.php" method="post">
+                <input type="text" name="username" placeholder="Username" required>
+                <input type="email" name="email" placeholder="Email Address" required>
+                <input type="tel" name="phoneNumber" placeholder="Mobile Number" required>
                 
                 <label class="dob-label">Date of Birth</label>
                 <div class="dob">
-                    <input type="number" placeholder="Day" min="1" max="31">
-                    <input type="number" placeholder="Month" min="1" max="12">
-                    <input type="number" placeholder="Year" min="1900" max="2100">
+                    <input type="number" name="day" placeholder="Day" min="1" max="31">
+                    <input type="number" name="month" placeholder="Month" min="1" max="12">
+                    <input type="number" name="year" placeholder="Year" min="1900" max="2100">
                 </div>
 
-                <input type="password" placeholder="Password" required>
-                <input type="password" placeholder="Confirm Password" required>
+                <input type="password" name="password" placeholder="Password" required>
+                <input type="password" name="confirm_password" placeholder="Confirm Password" required>
 
                 <label class="terms">
                     <input type="checkbox" required>
