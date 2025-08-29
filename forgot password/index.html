@@ -22,15 +22,15 @@
                 <h1>Forgot Password</h1>
                 <p class="subtitle">Enter your details to reset your password.</p>
 
-                <form class="form">
-                    <input type="email" placeholder="Email Address" required>
-                    <input type="tel" placeholder="Phone Number" required>
-                    <input type="password" placeholder="New Password" required>
-                    <input type="password" placeholder="Confirm Password" required>
+                <form class="form" action="includes/update.inc.php" method="post">
+                    <input name="email" type="email" placeholder="Email Address" required>
+                    <input name="phone_number" type="tel" placeholder="Phone Number" required>
+                    <input name="password" type="password" placeholder="New Password" required>
+                    <input name="confirm_password" type="password" placeholder="Confirm Password" required>
 
                     <button type="submit" class="btn">Change Password</button>
                 </form>
-                <a href="../Sign in/index.html" class="signin-link">Back to Sign in</a>
+                <a href="../sign in/signin.php" class="signin-link">Back to Sign in</a>
             </div>
         </div>
     </div>
