@@ -1,6 +1,6 @@
 // ---------- Static pages ----------
 const pages = {
-    dashboard: `<h2>Dashboard Overview</h2><p>This is your dashboard.</p>`,
+    dashboard: `<h2>Dashboard Overview</h2>`,
     reports: `<h2>Reports</h2><p>Charts and reports will be shown here.</p>`,
     settings: `<h2>Settings</h2><p>Adjust your preferences here.</p>`
 };
@@ -241,4 +241,22 @@ submenuLinks.forEach(link => {
 window.addEventListener("load", function () {
     loader.style.opacity = "0";
     setTimeout(() => loader.style.display = "none", 300);
+});
+
+// ---------- Avatar Dropdown ----------
+document.addEventListener("DOMContentLoaded", () => {
+    const avatar = document.querySelector(".avatar");
+    const menu = document.querySelector(".dropdown-menu");
+
+    if (avatar && menu) {
+        avatar.addEventListener("click", () => {
+            menu.classList.toggle("show");
+        });
+
+        document.addEventListener("click", (e) => {
+            if (!e.target.closest(".avatar-dropdown")) {
+                menu.classList.remove("show");
+            }
+        });
+    }
 });
