@@ -1,32 +1,43 @@
 <?php
 
-if($_SERVER["REQUEST_METHOD"] == "POST"){
+/**
+ * User Registration Form Handler
+ * 
+ * This file processes the user registration form submission,
+ * validates input, and creates new user accounts.
+ */
 
-  $username = $_POST["username"];
-  $email = $_POST["email"];
-  $phone_number = $_POST["phone_number"];
-  $pwd = $_POST["password"];
+declare(strict_types=1);
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+  $username = $_POST["username"] ?? '';
+  $email = $_POST["email"] ?? '';
+  $phone_number = $_POST["phone_number"] ?? '';
+  $pwd = $_POST["password"] ?? '';
 
   try {
     require_once "../../api/dbh.inc.php";
     require_once "model.inc.php";
     require_once "view.inc.php";
     require_once "contr.inc.php";
-    
 
     $errors = [];
 
+    // Validate input fields
     if (is_input_empty($username, $email, $phone_number, $pwd)) {
-      $errors["empty_imput"] = "Fill in all fields";
+      $errors["empty_input"] = "Fill in all fields";
     }
+
     if (is_email_invalid($email)) {
       $errors["invalid_email"] = "Invalid email used";
     }
+
     if (is_username_take($pdo, $username)) {
       $errors["username_taken"] = "Username already taken";
     }
+
     if (is_email_registered($pdo, $email)) {
-      $errors["email_used"] = "Email alreadt registered";
+      $errors["email_used"] = "Email already registered";
     }
 
     require_once "../../api/config_session.inc.php";
@@ -34,6 +45,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     if ($errors) {
       $_SESSION["errors_signup"] = $errors;
 
+      // Store form data for user convenience
       $signupData = [
         "username" => $username,
         "email" => $email,
@@ -45,20 +57,20 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
       die();
     }
 
+    // Create the user account
     create_user($pdo, $username, $email, $phone_number, $pwd);
 
-    header("Location: ../signup.php?signup=success");
-
+    // Clean up and redirect
     $pdo = null;
     $stmt = null;
 
+    header("Location: ../signup.php?signup=success");
     die();
-
   } catch (PDOException $e) {
-    die("Query failed: " . $e->getMessage());
+    error_log("User registration failed: " . $e->getMessage());
+    die("Registration failed. Please try again later.");
   }
-
-} else{
+} else {
   header("Location: ../signup.php");
   die();
 }

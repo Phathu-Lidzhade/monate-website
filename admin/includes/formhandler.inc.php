@@ -1,9 +1,9 @@
 <?php
 
 /**
- * User Login Form Handler
+ * Admin Login Form Handler
  * 
- * This file processes the user login form submission,
+ * This file processes the admin login form submission,
  * validates credentials, and manages authentication.
  */
 
@@ -30,8 +30,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $errors["invalid_email"] = "Invalid email used";
     }
 
-    // Get user from database
-    $result = get_user($pdo, $email);
+    // Get admin from database
+    $result = get_admin($pdo, $email);
 
     if (is_email_wrong($result)) {
       $errors["login_incorrect"] = "Incorrect login info";
@@ -44,8 +44,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     require_once "../../api/config_session.inc.php";
 
     if ($errors) {
-      $_SESSION["errors_signin"] = $errors;
-      header("Location: ../signin.php");
+      $_SESSION["errors_admin"] = $errors;
+      header("Location: ../admin-login.php");
       die();
     }
 
@@ -54,22 +54,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $sessionId = $newSessionId . "_" . $result["id"];
     session_id($sessionId);
 
-    // Set user session variables
-    $_SESSION["user_id"] = $result["id"];
-    $_SESSION["user_name"] = htmlspecialchars($result["username"]);
+    // Set admin session variables
+    $_SESSION["admin_id"] = $result["id"];
+    $_SESSION["admin_name"] = htmlspecialchars($result["name"]);
+    $_SESSION["admin_email"] = htmlspecialchars($result["email"]);
+    $_SESSION["admin_role"] = "admin"; // Default role since table doesn't have it
     $_SESSION["last_regeneration"] = time();
 
     // Clean up and redirect
     $pdo = null;
     $stmt = null;
 
-    header("Location: ../../menu/Thohoyandou.html");
+    header("Location: ../admin-dashboard.php");
     die();
   } catch (PDOException $e) {
-    error_log("User login query failed: " . $e->getMessage());
+    error_log("Admin login query failed: " . $e->getMessage());
     die("Login failed. Please try again later.");
   }
 } else {
-  header("Location: ../signin.php");
+  header("Location: ../admin-login.php");
   die();
 }

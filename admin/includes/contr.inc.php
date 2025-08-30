@@ -1,9 +1,9 @@
 <?php
 
 /**
- * User Authentication Controller Functions
+ * Admin Authentication Controller Functions
  * 
- * This file contains validation logic for user authentication
+ * This file contains validation logic for admin authentication
  * including input validation and password verification.
  */
 

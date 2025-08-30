@@ -1,21 +1,21 @@
 <?php
 
 /**
- * User Authentication View Functions
+ * Admin Authentication View Functions
  * 
- * This file contains functions for displaying authentication
+ * This file contains functions for displaying admin authentication
  * interface elements and error messages.
  */
 
 declare(strict_types=1);
 
 /**
- * Display signin errors if any exist
+ * Display admin login errors if any exist
  */
 function check_login_errors(): void
 {
-  if (isset($_SESSION["errors_signin"])) {
-    $errors = $_SESSION["errors_signin"];
+  if (isset($_SESSION["errors_admin"])) {
+    $errors = $_SESSION["errors_admin"];
 
     echo "<br>";
 
@@ -23,6 +23,6 @@ function check_login_errors(): void
       echo '<p class="form-error">' . htmlspecialchars($error) . '</p>';
     }
 
-    unset($_SESSION["errors_signin"]);
+    unset($_SESSION["errors_admin"]);
   }
 }
