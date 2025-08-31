@@ -43,6 +43,7 @@ body {
     transform: translateY(-100px); /* Moves everything up */
 }
 
+
 /* Logo spacing */
 .logo {
     display: block;
@@ -116,7 +117,7 @@ input[type="password"] {
     border-radius: 30px;
     padding: 12px;
     font-size: 18px;
-    width: 50%;
+    width: 100%;
     position: relative;
     left: 25%;
     cursor: pointer;

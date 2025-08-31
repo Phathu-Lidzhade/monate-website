@@ -14,7 +14,7 @@ declare(strict_types=1);
  */
 function get_admin(object $pdo, string $email): array|false
 {
-  $query = "SELECT * FROM admin WHERE email = :email;";
+  $query = "SELECT * FROM admins WHERE email = :email;";
   $stmt = $pdo->prepare($query);
   $stmt->bindParam(":email", $email);
   $stmt->execute();

@@ -56,9 +56,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Set admin session variables
     $_SESSION["admin_id"] = $result["id"];
-    $_SESSION["admin_name"] = htmlspecialchars($result["name"]);
     $_SESSION["admin_email"] = htmlspecialchars($result["email"]);
-    $_SESSION["admin_role"] = "admin"; // Default role since table doesn't have it
+    $_SESSION["admin_username"] = htmlspecialchars($result["username"]);
     $_SESSION["last_regeneration"] = time();
 
     // Clean up and redirect

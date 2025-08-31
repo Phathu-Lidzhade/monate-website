@@ -12,6 +12,7 @@ require_once 'includes/view.inc.php';
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
     <div class="desktop">
         
         <!-- Left Image Side -->
@@ -21,6 +22,29 @@ require_once 'includes/view.inc.php';
 
         <!-- Right Form Side -->
         <div class="container">
+<!--
+        <header class="top-header">
+                <div class="logo">
+                <img src="img/logo 2.png" alt="Monate Logo">
+                </div>
+                <nav class="nav-links">
+                <a href="index.html">HOME</a>
+                <a href="about us/index.html">ABOUT US</a>
+                </nav>
+
+                <div class="account-cart">
+                <div class="account">
+                    <img src="img/profile.png" alt="Account">
+                    <span>ACCOUNT</span>
+                </div>
+                <div class="divider"></div>
+                <div class="cart">
+                    <img src="img/shopping cart.png" alt="Cart">
+                </div>
+
+                </div>
+            </header>-->
+
             <img class="logo" src="img/logo 1.png" alt="Logo">
 
             <div class="form-section">
@@ -49,6 +73,7 @@ require_once 'includes/view.inc.php';
                 <p class="signup-text">
                     Don’t have an account? <a href="../create account/signup.php" class="signup-link">Sign up</a>
                 </p>
+                <a class="signup-link" href="../index.html">HOME</a>
             </div>
         </div>
     </div>
