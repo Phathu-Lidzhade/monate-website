@@ -1,6 +1,11 @@
 // ---------- Static pages ----------
 const pages = {
-    dashboard: `<h2>Dashboard Overview</h2><p>This is your dashboard.</p>`,
+    dashboard: `
+    <h2>Welcome, Admin!</h2>
+    <p>Email: ${adminData.email}</p>
+    <p>Branch: ${adminData.branch}</p>
+    <p>Select a menu item to view its content here.</p>
+`,
     reports: `<h2>Reports</h2><p>Charts and reports will be shown here.</p>`,
     settings: `<h2>Settings</h2><p>Adjust your preferences here.</p>`
 };
@@ -8,63 +13,52 @@ const pages = {
 // ---------- Menu Management sub-pages ----------
 const subPages = {
     currentMenu: `
-        <h2>Current Menu Items</h2>
-        <div class="card">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Image</th>
-                        <th>Dish Name</th>
-                        <th>Price</th>
-                        <th>Description</th>
-                        <th>Sauce</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="menuTableBody">
-                    <tr>
-                        <td><img src="img/sample.jpg" style="width:50px; height:50px; object-fit:cover; border-radius:4px;"></td>
-                        <td>Burger</td>
-                        <td>R 50.00</td>
-                        <td>Juicy beef burger</td>
-                        <td>BBQ</td>
-                        <td>
-                            <button class="btn-warning">Edit</button>
-                            <button class="btn-danger">Delete</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    `,
+    <h2>Current Menu Items</h2>
+    <div class="card">
+        <table>
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Dish Name</th>
+                    <th>Price</th>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="menuTableBody"></tbody>
+        </table>
+    </div>
+`,
     addMenu: `
-        <h2>Add New Menu Item</h2>
-        <div class="card">
-            <form id="menuForm">
-                <label>Dish Name:</label>
-                <input type="text" name="name" required>
+    <h2>Add New Menu Item</h2>
+    <div class="card">
+        <form id="menuForm" action="add_menu_item.php" method="POST" enctype="multipart/form-data">
+            <label>Dish Name:</label>
+            <input type="text" name="name" required>
 
-                <label>Price (R):</label>
-                <input type="number" name="price" step="0.01" required>
+            <label>Price (R):</label>
+            <input type="number" name="price" step="0.01" required>
 
-                <label>Description:</label>
-                <textarea name="description" rows="3"></textarea>
+            <label>Description:</label>
+            <textarea name="description" rows="3"></textarea>
 
-                <label>Choose Sauce:</label>
-                <select name="sauce">
-                    <option value="Hot">Hot</option>
-                    <option value="Mild">Mild</option>
-                    <option value="BBQ">BBQ</option>
-                    <option value="Garlic">Garlic</option>
-                </select>
+            <label>Category:</label>
+            <select name="category" required>
+                <option value="CHICKEN">CHICKEN</option>
+                <option value="KOTA">KOTA</option>
+                <option value="SHARING">SHARING</option>
+                <option value="WINGS">WINGS</option>
+                <option value="DRINKS">DRINKS</option>
+            </select>
 
-                <label>Upload Image:</label>
-                <input type="file" name="image" accept="image/*">
+            <label>Upload Image:</label>
+            <input type="file" name="image" accept="image/*" required>
 
-                <button type="submit" class="btn-accent">Add Menu Item</button>
-            </form>
-        </div>
-    `
+            <button type="submit" class="btn-accent">Add Menu Item</button>
+        </form>
+    </div>
+`
 };
 
 // ---------- Orders page ----------
@@ -79,36 +73,51 @@ function renderOrders() {
                         <th>Customer</th>
                         <th>Item(s)</th>
                         <th>Total (R)</th>
+                        <th>Address & Instructions</th>
                         <th>Status</th>
+                        <th>Created At</th>
                     </tr>
                 </thead>
-                <tbody id="ordersBody">
-                    ${[
-                        {id:'#001', customer:'John Doe', items:'BBQ Burger x1', total:'75.00', status:'Pending'},
-                        {id:'#002', customer:'Mary Smith', items:'Hot Wings x2', total:'120.00', status:'Ready'},
-                        {id:'#003', customer:'Lerato M.', items:'Chicken Wrap x1, Fries x1', total:'95.00', status:'Delivered'}
-                    ].map(o => `
-                        <tr class="order-row">
-                            <td>${o.id}</td>
-                            <td>${o.customer}</td>
-                            <td>${o.items}</td>
-                            <td>${o.total}</td>
-                            <td>
-                                <div class="status-cell">
-                                    <span class="badge ${statusClass(o.status)} js-status">${o.status}</span>
-                                    <select class="status-select" aria-label="Change status">
-                                        <option value="Pending" ${o.status==='Pending' ? 'selected':''}>Pending</option>
-                                        <option value="Ready" ${o.status==='Ready' ? 'selected':''}>Ready</option>
-                                        <option value="Delivered" ${o.status==='Delivered' ? 'selected':''}>Delivered</option>
-                                    </select>
-                                </div>
-                            </td>
-                        </tr>
-                    `).join('')}
-                </tbody>
+                <tbody id="ordersBody"></tbody>
             </table>
         </div>
     `;
+}
+
+function loadOrders() {
+    fetch("fetch_orders.php")
+        .then(res => res.json())
+        .then(data => {
+            const tbody = document.getElementById("ordersBody");
+            tbody.innerHTML = "";
+            data.forEach(o => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${o.id}</td>
+                        <td>${o.customer}</td>
+                        <td>${o.items}</td>
+                        <td>${o.total}</td>
+                        <td>
+                            ${o.address ? `<div><strong>Address:</strong> ${o.address}</div>` : ""}
+                            ${o.instructions ? `<div><strong>Note:</strong> ${o.instructions}</div>` : ""}
+                        </td>
+                        <td>
+                            <div class="status-cell">
+                                <span class="badge ${statusClass(o.status)} js-status">${o.status}</span>
+                                <select class="status-select" data-id="${o.id}">
+                                    <option value="Pending" ${o.status==='Pending' ? 'selected':''}>Pending</option>
+                                    <option value="Ready" ${o.status==='Ready' ? 'selected':''}>Ready</option>
+                                    <option value="Delivered" ${o.status==='Delivered' ? 'selected':''}>Delivered</option>
+                                </select>
+                            </div>
+                        </td>
+                        <td>${o.created_at}</td>
+                    </tr>
+                `;
+            });
+            initOrdersPage();
+        })
+        .catch(err => console.error("Error loading orders:", err));
 }
 
 function statusClass(value) {
@@ -123,54 +132,111 @@ function statusClass(value) {
 function initOrdersPage() {
     document.querySelectorAll('.status-select').forEach(sel => {
         sel.addEventListener('change', function () {
+            const newVal = this.value;
             const cell = this.closest('.status-cell');
             const badge = cell.querySelector('.js-status');
-            const newVal = this.value;
+            const orderId = this.dataset.id;
+
+            // Optimistic UI update
             badge.textContent = newVal;
-            badge.classList.remove('status-pending','status-ready','status-delivered');
-            badge.classList.add(statusClass(newVal));
+            badge.className = `badge ${statusClass(newVal)} js-status`;
+
+            // Send to backend
+            fetch("update_status.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: `id=${orderId}&status=${encodeURIComponent(newVal)}`
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) {
+                    alert("Failed to update order status: " + (data.error || "Unknown error"));
+                }
+            })
+            .catch(err => {
+                console.error("Error updating status:", err);
+                alert("Error updating order status.");
+            });
         });
     });
 }
 
 // ---------- Customers page ----------
 function renderCustomers() {
-    const customersData = [
-        { name: "John Doe", email: "john@example.com", phone: "072-123-4567", orders: 5 },
-        { name: "Mary Smith", email: "mary@example.com", phone: "082-987-6543", orders: 2 },
-        { name: "Lerato M.", email: "lerato@example.com", phone: "079-555-1234", orders: 8 }
-    ];
-
     return `
         <h2>Customers</h2>
         <div class="card">
             <table>
                 <thead>
                     <tr>
-                        <th>Name</th>
+                        <th>ID</th>
+                        <th>Username</th>
                         <th>Email</th>
-                        <th>Phone</th>
-                        <th>Total Orders</th>
-                        <th>Actions</th>
+                        <th>Mobile</th>
+                        <th>Orders Made</th>
+                        <th>Total Spent (R)</th>
                     </tr>
                 </thead>
-                <tbody>
-                    ${customersData.map(c => `
-                        <tr>
-                            <td>${c.name}</td>
-                            <td>${c.email}</td>
-                            <td>${c.phone}</td>
-                            <td>${c.orders}</td>
-                            <td>
-                                <button class="btn-warning">View</button>
-                                <button class="btn-danger">Delete</button>
-                            </td>
-                        </tr>
-                    `).join('')}
-                </tbody>
+                <tbody id="customersBody"></tbody>
             </table>
         </div>
     `;
+}
+
+function loadCustomers() {
+    fetch("fetch_customers.php")
+        .then(res => res.json())
+        .then(data => {
+            const tbody = document.getElementById("customersBody");
+            tbody.innerHTML = "";
+            data.forEach(c => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${c.id}</td>
+                        <td>${c.username}</td>
+                        <td>${c.email}</td>
+                        <td>${c.mobile}</td>
+                        <td>${c.orders_made}</td>
+                        <td>R${c.total_spent}</td>
+                    </tr>
+                `;
+            });
+        })
+        .catch(err => console.error("Error loading customers:", err));
+}
+
+// ---------- NEW: Menu Items ----------
+function loadMenuItems() {
+    fetch("fetch_menu_items.php")
+        .then(res => res.json())
+        .then(data => {
+            const tbody = document.getElementById("menuTableBody");
+            tbody.innerHTML = "";
+            data.forEach(item => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><img src="menu_item/${item.image}" alt="${item.name}" style="width:60px; height:60px; object-fit:cover;"></td>
+                        <td>${item.name}</td>
+                        <td>R${parseFloat(item.price).toFixed(2)}</td>
+                        <td>${item.description || ""}</td>
+                        <td>${item.category || ""}</td>
+                        <td><button onclick="deleteMenuItem(${item.id})">Delete</button></td>
+                    </tr>
+                `;
+            });
+        })
+        .catch(err => console.error("Error loading menu items:", err));
+}
+
+function deleteMenuItem(id) {
+    if (!confirm("Are you sure you want to delete this item?")) return;
+    fetch(`delete_menu_item.php?id=${id}`)
+        .then(res => res.text())
+        .then(msg => {
+            alert(msg);
+            loadMenuItems();
+        })
+        .catch(err => console.error("Error deleting item:", err));
 }
 
 // ---------- Navigation + loader ----------
@@ -203,10 +269,11 @@ navLinks.forEach(link => {
         showLoaderThen(() => {
             if (page === 'orders') {
                 mainContent.innerHTML = renderOrders();
-                initOrdersPage();
+                loadOrders();
             } 
             else if (page === 'customers') {
                 mainContent.innerHTML = renderCustomers();
+                loadCustomers();
             }
             else {
                 mainContent.innerHTML = pages[page] || "<p>Page not found.</p>";
@@ -222,6 +289,7 @@ menuBtn.addEventListener("click", e => {
     submenuLinks[0].classList.add("active");
     showLoaderThen(() => {
         mainContent.innerHTML = subPages["currentMenu"];
+        loadMenuItems();
     });
 });
 
@@ -233,6 +301,7 @@ submenuLinks.forEach(link => {
         const sub = link.getAttribute("data-subpage");
         showLoaderThen(() => {
             mainContent.innerHTML = subPages[sub];
+            if (sub === "currentMenu") loadMenuItems();
         });
     });
 });
@@ -241,4 +310,17 @@ submenuLinks.forEach(link => {
 window.addEventListener("load", function () {
     loader.style.opacity = "0";
     setTimeout(() => loader.style.display = "none", 300);
+});
+
+// ---------- Account Dropdown ----------
+const accountBtn = document.getElementById("accountBtn");
+const accountDropdown = document.getElementById("accountDropdown");
+
+accountBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    accountDropdown.classList.toggle("show");
+});
+
+window.addEventListener("click", () => {
+    accountDropdown.classList.remove("show");
 });

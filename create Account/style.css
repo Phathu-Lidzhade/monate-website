@@ -17,19 +17,17 @@ body {
     min-height: 100vh;
 }
 
-
 .image-side {
     flex: 1;
     display: flex;
-    height: 100vh; 
+    height: 127vh; 
 }
 
 .bacc {
     width: 95%;
     height: 100%;
-    object-fit:fill; 
+    object-fit: fill; 
 }
-
 
 .container {
     flex: 1;
@@ -37,9 +35,8 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    max-width: 50%;
+    max-width: 600px;
     margin: auto;
-    height: 100vh;
 }
 
 .logo {
@@ -58,8 +55,6 @@ h1 {
     display: flex;
     flex-direction: column;
     gap: 15px;
-    padding-right: 10%;
-    padding-left: 10%;
 }
 
 input[type="text"],
@@ -68,7 +63,7 @@ input[type="tel"],
 input[type="password"],
 input[type="number"] {
     width: 100%;
-    padding: 13px;
+    padding: 15px;
     border-radius: 30px;
     border: 1px solid #acacac;
     background: #f2f2f2;
@@ -104,9 +99,6 @@ input[type="number"] {
     border-radius: 30px;
     padding: 12px;
     font-size: 18px;
-    width: 50%;
-    position: relative;
-    left: 25%;
     cursor: pointer;
 }
 
@@ -124,7 +116,6 @@ input[type="number"] {
     color: #a92a28;
     font-weight: bold;
 }
-
 
 @media (max-width: 1024px) {
     .image-side {

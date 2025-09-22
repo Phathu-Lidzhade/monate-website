@@ -60,16 +60,6 @@ body {
   color: black;
   font-size: 1rem;
 }
-.logout-btn {
-  background: #a92a28;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  padding: 5px;
-  font-size: 18px;
-  position: relative;
-  cursor: pointer;
-}
 
 .account img,
 .cart img {
@@ -283,6 +273,8 @@ body {
 .add-cart:hover {
   background: #c4161f;
 }
+
+
 
 /* RESPONSIVE */
 @media(max-width: 768px){
