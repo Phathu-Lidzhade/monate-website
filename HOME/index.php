@@ -130,7 +130,7 @@ if (isset($_SESSION["user_id"])) {
       <div class="branch-container">
         <a class="btn">EAT NOW</a>
         <div class="branch-dropdown">
-          <p>Pick a location</p>
+          <p class="dropdown-text">Pick a location</p>
           <a href="../menu/Thohoyandou.php">Thohoyandou</a>
           <a href="../menu/Mukula.php">Mukula</a>
           <a href="../menu/Lufule.php">Lufule</a>

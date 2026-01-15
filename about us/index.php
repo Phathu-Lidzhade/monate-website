@@ -34,7 +34,7 @@ require_once __DIR__ . '/includes/control.php';
       </a>
       <div class="divider"></div>
       <!-- Cart -->
-      <a href="cart.html" class="cart">
+      <a href="../menu/cart.php" class="cart">
         <img src="img/shopping cart.png" alt="Cart">
       </a>
     </div>
