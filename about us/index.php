@@ -1,6 +1,20 @@
 <?php
-// run controller first so it can start the session and prepare variables
-require_once __DIR__ . '/includes/control.php';
+session_start();
+require_once "../API/db.php";
+
+// ✅ User info for dropdown
+$userData = null;
+if (isset($_SESSION["user_id"])) {
+    $userId = $_SESSION["user_id"];
+    $userStmt = $conn->prepare("SELECT username, email, mobile FROM users WHERE id = ?");
+    if ($userStmt) {
+        $userStmt->bind_param("i", $userId);
+        $userStmt->execute();
+        $userData = $userStmt->get_result()->fetch_assoc();
+        $userStmt->close();
+    }
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -9,6 +23,40 @@ require_once __DIR__ . '/includes/control.php';
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Monate Chicken N Steak - About Us</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* Account dropdown */
+    .account-dropdown {
+      display: none;
+      position: absolute;
+      right: 0;
+      background: #fff;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+      padding: 10px;
+      border-radius: 8px;
+      z-index: 10;
+      min-width: 180px;
+    }
+    .account-container {
+      position: relative;
+      display: inline-block;
+      cursor: pointer;
+    }
+    .account-dropdown p {
+      margin: 5px 0;
+      font-size: 14px;
+      color: #333;
+    }
+    .account-dropdown a {
+      display: block;
+      background: red;
+      color: white;
+      text-align: center;
+      padding: 6px;
+      text-decoration: none;
+      border-radius: 4px;
+      margin-top: 5px;
+    }
+  </style>
 </head>
 <body>
 
@@ -23,21 +71,31 @@ require_once __DIR__ . '/includes/control.php';
     </nav>
     <div class="account-cart">
       <!-- Account -->
-      <a href="../Sign in/index.php" class="account">
-        <img src="img/profile.png" alt="Account">
-        <span>
-          <?php
-            // render the account text (view is responsible for display only)
-            require_once __DIR__ . '/includes/view.php';
-          ?>
-        </span>
-      </a>
-      <div class="divider"></div>
-      <!-- Cart -->
-      <a href="cart.html" class="cart">
-        <img src="img/shopping cart.png" alt="Cart">
-      </a>
+      <div class="account-container">
+        <?php if (isset($_SESSION["user_id"])): ?>
+          <!-- User logged in: show dropdown toggle -->
+          <a class="account" href="javascript:void(0);">
+            <img src="img/profile.png" alt="Account">
+            <span>
+              Hi, <?= htmlspecialchars($_SESSION["username"]); ?>
+            </span>
+          </a>
+          <div class="account-dropdown">
+            <p><strong>Username:</strong> <?= htmlspecialchars($userData['username']); ?></p>
+            <p><strong>Email:</strong> <?= htmlspecialchars($userData['email']); ?></p>
+            <p><strong>Mobile:</strong> <?= htmlspecialchars($userData['mobile']); ?></p>
+            <a href="../Logout/logout.php">Logout</a>
+          </div>
+        <?php else: ?>
+          <!-- User not logged in: simple link to sign in -->
+          <a href="../Sign in/index.php" class="account">
+            <img src="img/profile.png" alt="Account">
+            <span>ACCOUNT</span>
+          </a>
+        <?php endif; ?>
+      </div>
     </div>
+
   </header>
 
   <!-- Story -->
@@ -68,7 +126,7 @@ require_once __DIR__ . '/includes/control.php';
     <p>
       Everyone has a secret. You know our secret sauce, Monate chicken sauce comes in all flavours you can think of: Mild, Hot, Extra hot for the brave. Specially mixed by the CEO since inception, look no further to spice your own home cooked or braai meat.
     </p>
-    <a href="contact.php" class="btn">Contact Us</a>
+    <a href="https://wa.me/0764097332?text=I%27m%20interested%20in%20your%20monater%20source" class="btn">Contact Us</a>
   </section>
 
   <!-- Footer -->
@@ -78,9 +136,10 @@ require_once __DIR__ . '/includes/control.php';
         <h3>Monate Chicken</h3>
         <p>Sharing our culture through good food.</p>
         <div class="social">
-          <img src="img/facebook.png" alt="Facebook">
-          <img src="img/instagram.png" alt="Instagram">
+         <a href="https://www.facebook.com/monatechicken34"><img  src="img/facebook.png" alt="Facebook"></a> 
+         <a href="https://www.instagram.com/monatechickenandsteak/#"> <img src="img/instagram.png" alt="Instagram"></a>
         </div>
+
       </div>
       <div class="right">
         <h3>Contact Us</h3>
@@ -90,6 +149,18 @@ require_once __DIR__ . '/includes/control.php';
       </div>
     </div>
   </footer>
+
+  <script>
+  // Account dropdown toggle
+  const accountContainer = document.querySelector('.account-container');
+  const accountDropdown = document.querySelector('.account-dropdown');
+  if(accountContainer && accountDropdown){
+    accountContainer.addEventListener('click', () => {
+      accountDropdown.style.display =
+        accountDropdown.style.display === 'block' ? 'none' : 'block';
+    });
+  }
+</script>
 
 </body>
 </html>

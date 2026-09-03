@@ -2,6 +2,19 @@
 session_start();
 require_once "../API/db.php";
 
+// ✅ User info for dropdown
+$userData = null;
+if (isset($_SESSION["user_id"])) {
+    $userId = $_SESSION["user_id"];
+    $userStmt = $conn->prepare("SELECT username, email, mobile FROM users WHERE id = ?");
+    if ($userStmt) {
+        $userStmt->bind_param("i", $userId);
+        $userStmt->execute();
+        $userData = $userStmt->get_result()->fetch_assoc();
+        $userStmt->close();
+    }
+}
+
 // Force branch
 $branchLocation = "Thohoyandou";
 
@@ -19,7 +32,7 @@ while ($row = $result->fetch_assoc()) {
     $menuItems[$row["category"]][] = $row;
 }
 
-// Cart count for this user & branch (copied from cart.php)
+// ✅ Cart count for this user & branch (copied from cart.php)
 $cartCount = 0;
 if (isset($_SESSION["user_id"])) {
     $userId = $_SESSION["user_id"];
@@ -37,8 +50,6 @@ if (isset($_SESSION["user_id"])) {
 ?>
 
 
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -46,16 +57,56 @@ if (isset($_SESSION["user_id"])) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Monate Menu - Thohoyandou</title>
   <link rel="stylesheet" href="style.css" />
+  <!-- ✅ Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
   <style>
-    /* Cart badge style */
-    .cart {
+    /* Account dropdown */
+    .account-dropdown {
+      display: none;
+      position: absolute;
+      right: 0;
+      background: #fff;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+      padding: 10px;
+      border-radius: 8px;
+      z-index: 10;
+      min-width: 180px;
+    }
+    .account-container {
       position: relative;
       display: inline-block;
+      cursor: pointer;
+    }
+    .account-dropdown p {
+      margin: 5px 0;
+      font-size: 14px;
+      color: #333;
+    }
+    .account-dropdown a {
+      display: block;
+      background: red;
+      color: white;
+      text-align: center;
+      padding: 6px;
+      text-decoration: none;
+      border-radius: 4px;
+      margin-top: 5px;
+    }
+
+    /* Cart + Orders */
+    .cart, .orders {
+      position: relative;
+      display: inline-block;
+      margin-left: 15px;
+      font-size: 22px;
+      color: #333;
+      text-decoration: none;
     }
     .cart-badge {
       position: absolute;
       top: -5px;
-      right: -5px;
+      right: -10px;
       background: red;
       color: white;
       font-size: 12px;
@@ -81,11 +132,11 @@ if (isset($_SESSION["user_id"])) {
     .detail-content {
       background: #fff;
       border-radius: 12px;
-      max-width: 1000px; /* Increased width */
+      max-width: 1000px;
       width: 90%;
       display: flex;
-      gap: 30px; /* Increased gap */
-      padding: 30px; /* Increased padding */
+      gap: 30px;
+      padding: 30px;
       position: relative;
     }
     #close-detail {
@@ -97,23 +148,23 @@ if (isset($_SESSION["user_id"])) {
       cursor: pointer;
     }
     .detail-left img {
-      max-width: 300px; /* Increased image size */
+      max-width: 300px;
       border-radius: 10px;
     }
     .detail-right {
       flex: 1;
     }
     .detail-right h2 {
-      font-size: 28px; /* Larger title */
+      font-size: 28px;
       margin-bottom: 10px;
     }
     .detail-right .food-price {
-      font-size: 24px; /* Larger price */
+      font-size: 24px;
       color:rgb(167, 40, 40);
       margin-bottom: 15px;
     }
     .detail-right p {
-      font-size: 16px; /* Larger description text */
+      font-size: 16px;
       color: #555;
       margin-bottom: 20px;
     }
@@ -132,24 +183,18 @@ if (isset($_SESSION["user_id"])) {
     }
     .add-cart {
       display: inline-block;
-      padding: 12px 24px; /* Larger button */
+      padding: 12px 24px;
       background:rgb(168, 49, 49);
       color: #fff;
       border: none;
       border-radius: 6px;
       cursor: pointer;
       margin-top: 10px;
-      font-size: 16px; /* Larger button text */
+      font-size: 16px;
     }
 
     .sauce-selection {
       margin: 10px 0;
-    }
-    .sauce-selection select {
-      padding: 8px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
     }
     .sauce-options {
       display: flex;
@@ -165,7 +210,7 @@ if (isset($_SESSION["user_id"])) {
       transition: background-color 0.3s, color 0.3s;
     }
     .sauce-btn.active {
-      background-color: #168131; /* Active button color */
+      background-color: #168131;
       color: #fff;
       border-color: #168131;
     }
@@ -187,25 +232,38 @@ if (isset($_SESSION["user_id"])) {
     </nav>
     <div class="account-cart">
       <!-- Account -->
-      <a href="../Sign in/index.php" class="account">
-        <img src="img/profile.png" alt="Account">
-        <span>
-          <?php if (isset($_SESSION["username"])): ?>
-            Hi, <?= htmlspecialchars($_SESSION["username"]); ?>
-          <?php else: ?>
-            ACCOUNT
-          <?php endif; ?>
-        </span>
-      </a>
-      <div class="divider"></div>
-     <!-- Cart -->
-<a href="<?php echo isset($_SESSION["user_id"]) ? 'cart.php' : '../Sign in/index.php'; ?>" class="cart">
-    <img src="img/shopping cart.png" alt="Cart">
-    <?php if ($cartCount > 0): ?>
-      <span class="cart-badge"><?= $cartCount ?></span>
-    <?php endif; ?>
-</a>
+      <div class="account-container">
+        <?php if (isset($_SESSION["user_id"])): ?>
+          <a class="account" href="javascript:void(0);">
+            <img src="img/profile.png" alt="Account">
+            <span>
+              Hi, <?= htmlspecialchars($_SESSION["username"]); ?>
+            </span>
+          </a>
+          <div class="account-dropdown">
+            <p><strong>Username:</strong> <?= htmlspecialchars($userData['username']); ?></p>
+            <p><strong>Email:</strong> <?= htmlspecialchars($userData['email']); ?></p>
+            <p><strong>Mobile:</strong> <?= htmlspecialchars($userData['mobile']); ?></p>
+            <a href="../Logout/logout.php">Logout</a>
+          </div>
+        <?php else: ?>
+          <a href="../Sign in/index.php" class="account">
+            <img src="img/profile.png" alt="Account">
+            <span>ACCOUNT</span>
+          </a>
+        <?php endif; ?>
+      </div>
 
+      <div class="divider"></div>
+
+      <!-- Cart -->
+      <a href="<?php echo isset($_SESSION["user_id"]) ? 'cart.php' : '../Sign in/index.php'; ?>" class="cart">
+        <i class="fa-solid fa-cart-shopping"></i>
+        <?php if ($cartCount > 0): ?>
+          <span class="cart-badge"><?= $cartCount ?></span>
+        <?php endif; ?>
+      </a>
+    
     </div>
   </header>
 
@@ -215,7 +273,6 @@ if (isset($_SESSION["user_id"])) {
       <img src="img/location.png" alt="Location">
       <span>THOHOYANDOU</span>
     </a>
-
   </div>
 
   <!-- MAIN MENU -->
@@ -297,157 +354,145 @@ if (isset($_SESSION["user_id"])) {
     </div>
   </div>
 
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const sideMenuItems = document.querySelectorAll(".side-menu li");
-      const sections = document.querySelectorAll(".menu-section h3, .menu-grid");
+<script>
+  // Account dropdown toggle
+  const accountContainer = document.querySelector('.account-container');
+  const accountDropdown = document.querySelector('.account-dropdown');
+  if(accountContainer && accountDropdown){
+    accountContainer.addEventListener('click', () => {
+      accountDropdown.style.display =
+        accountDropdown.style.display === 'block' ? 'none' : 'block';
+    });
+  }
 
-      // Filter by category
-      sideMenuItems.forEach(item => {
-        item.addEventListener("click", () => {
-          const category = item.getAttribute("data-category").toUpperCase();
+  document.addEventListener("DOMContentLoaded", () => {
+    const sideMenuItems = document.querySelectorAll(".side-menu li");
+    const sections = document.querySelectorAll(".menu-section h3, .menu-grid");
 
-          sections.forEach(section => {
-            if (section.tagName === "H3") {
-              section.style.display = (section.textContent === category) ? "block" : "none";
-            } else {
-              section.style.display = (section.previousElementSibling.textContent === category) ? "grid" : "none";
-            }
-          });
+    // Filter by category
+    sideMenuItems.forEach(item => {
+      item.addEventListener("click", () => {
+        const category = item.getAttribute("data-category").toUpperCase();
 
-          sideMenuItems.forEach(i => i.classList.remove("active"));
-          item.classList.add("active");
+        sections.forEach(section => {
+          if (section.tagName === "H3") {
+            section.style.display = (section.textContent === category) ? "block" : "none";
+          } else {
+            section.style.display = (section.previousElementSibling.textContent === category) ? "grid" : "none";
+          }
         });
-      });
 
-      // Default: show first category
-      if (sideMenuItems.length > 0) {
-        sideMenuItems[0].click();
-      }
-
-      // Popup logic
-      const detail = document.getElementById("item-detail");
-      const closeBtn = document.getElementById("close-detail");
-
-      const detailId = document.getElementById("detail-id");
-      const detailName = document.getElementById("detail-name");
-      const detailPrice = document.getElementById("detail-price");
-      const detailDesc = document.getElementById("detail-description");
-      const detailImg = document.getElementById("detail-img");
-
-      const inputName = document.getElementById("detail-name-input");
-      const inputPrice = document.getElementById("detail-price-input");
-      const inputImg = document.getElementById("detail-img-input");
-
-      let qty = 1;
-      const qtySpan = document.getElementById("qty");
-      const qtyInput = document.getElementById("qtyInput");
-
-      document.getElementById("plus").addEventListener("click", () => {
-        if (qty < 10) qty++;
-        qtySpan.textContent = qty;
-        qtyInput.value = qty;
-      });
-
-      document.getElementById("minus").addEventListener("click", () => {
-        if (qty > 1) qty--;
-        qtySpan.textContent = qty;
-        qtyInput.value = qty;
-      });
-
-      // Handle clicks on menu cards
-      document.querySelectorAll(".menu-card").forEach(card => {
-        card.addEventListener("click", () => {
-          qty = 1;
-          qtySpan.textContent = qty;
-          qtyInput.value = qty;
-
-          // Fill details
-          detailId.value = card.dataset.id;
-          detailName.textContent = card.dataset.name;
-          detailPrice.textContent = card.dataset.price;
-          detailDesc.textContent = card.dataset.description;
-          detailImg.src = card.dataset.image;
-
-          inputName.value = card.dataset.name;
-          inputPrice.value = card.dataset.price;
-          inputImg.value = card.dataset.image;
-
-          // Update URL
-          const newUrl = window.location.pathname + "?id=" + card.dataset.id;
-          window.history.pushState({id: card.dataset.id}, "", newUrl);
-
-          detail.classList.remove("hidden");
-
-          // Reset sauce dropdown
-          sauceDropdown.value = "";
-        });
-      });
-
-      // Close popup
-      closeBtn.addEventListener("click", () => {
-        detail.classList.add("hidden");
-        window.history.pushState({}, "", window.location.pathname);
-      });
-
-      // Auto-open if ?id= is in URL
-      const urlParams = new URLSearchParams(window.location.search);
-      const selectedId = urlParams.get("id");
-
-      if (selectedId) {
-        const card = document.querySelector(`.menu-card[data-id='${selectedId}']`);
-        if (card) {
-          card.click(); // trigger popup open
-        }
-      }
-
-      const sauceButtons = document.querySelectorAll(".sauce-btn");
-      const sauceInput = document.getElementById("sauce-input");
-
-      // Handle sauce selection
-      sauceButtons.forEach(button => {
-        button.addEventListener("click", () => {
-          // Remove active class from all buttons
-          sauceButtons.forEach(btn => btn.classList.remove("active"));
-
-          // Add active class to the clicked button
-          button.classList.add("active");
-
-          // Set the selected sauce value
-          sauceInput.value = button.dataset.sauce;
-        });
-      });
-
-      // Validate sauce selection before form submission
-      window.validateSauceSelection = () => {
-        if (!sauceInput.value) {
-          alert("Please select a sauce before adding to cart.");
-          return false;
-        }
-        return true;
-      };
-
-      // Reset sauce selection when opening the popup
-      document.querySelectorAll(".menu-card").forEach(card => {
-        card.addEventListener("click", () => {
-          sauceInput.value = ""; // Reset sauce input
-          sauceButtons.forEach(btn => btn.classList.remove("active")); // Remove active class
-        });
+        sideMenuItems.forEach(i => i.classList.remove("active"));
+        item.classList.add("active");
       });
     });
 
-    function validateSauceSelection() {
-      const sauceSelect = document.getElementById("sauce");
-      const sauceInput = document.getElementById("sauce-input");
-
-      if (sauceSelect.value === "") {
-        alert("Please select a sauce.");
-        return false;
-      }
-
-      sauceInput.value = sauceSelect.value;
-      return true;
+    // Default: show first category
+    if (sideMenuItems.length > 0) {
+      sideMenuItems[0].click();
     }
-  </script>
+
+    // Popup logic
+    const detail = document.getElementById("item-detail");
+    const closeBtn = document.getElementById("close-detail");
+
+    const detailId = document.getElementById("detail-id");
+    const detailName = document.getElementById("detail-name");
+    const detailPrice = document.getElementById("detail-price");
+    const detailDesc = document.getElementById("detail-description");
+    const detailImg = document.getElementById("detail-img");
+
+    const inputName = document.getElementById("detail-name-input");
+    const inputPrice = document.getElementById("detail-price-input");
+    const inputImg = document.getElementById("detail-img-input");
+
+    let qty = 1;
+    const qtySpan = document.getElementById("qty");
+    const qtyInput = document.getElementById("qtyInput");
+
+    document.getElementById("plus").addEventListener("click", () => {
+      if (qty < 10) qty++;
+      qtySpan.textContent = qty;
+      qtyInput.value = qty;
+    });
+
+    document.getElementById("minus").addEventListener("click", () => {
+      if (qty > 1) qty--;
+      qtySpan.textContent = qty;
+      qtyInput.value = qty;
+    });
+
+    // Handle clicks on menu cards
+    document.querySelectorAll(".menu-card").forEach(card => {
+      card.addEventListener("click", () => {
+        qty = 1;
+        qtySpan.textContent = qty;
+        qtyInput.value = qty;
+
+        // Fill details
+        detailId.value = card.dataset.id;
+        detailName.textContent = card.dataset.name;
+        detailPrice.textContent = card.dataset.price;
+        detailDesc.textContent = card.dataset.description;
+        detailImg.src = card.dataset.image;
+
+        inputName.value = card.dataset.name;
+        inputPrice.value = card.dataset.price;
+        inputImg.value = card.dataset.image;
+
+        // Update URL
+        const newUrl = window.location.pathname + "?id=" + card.dataset.id;
+        window.history.pushState({id: card.dataset.id}, "", newUrl);
+
+        detail.classList.remove("hidden");
+      });
+    });
+
+    // Close popup
+    closeBtn.addEventListener("click", () => {
+      detail.classList.add("hidden");
+      window.history.pushState({}, "", window.location.pathname);
+    });
+
+    // Auto-open if ?id= is in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const selectedId = urlParams.get("id");
+
+    if (selectedId) {
+      const card = document.querySelector(`.menu-card[data-id='${selectedId}']`);
+      if (card) {
+        card.click(); // trigger popup open
+      }
+    }
+
+    const sauceButtons = document.querySelectorAll(".sauce-btn");
+    const sauceInput = document.getElementById("sauce-input");
+
+    // Handle sauce selection
+    sauceButtons.forEach(button => {
+      button.addEventListener("click", () => {
+        sauceButtons.forEach(btn => btn.classList.remove("active"));
+        button.classList.add("active");
+        sauceInput.value = button.dataset.sauce;
+      });
+    });
+
+    // Validate sauce selection before form submission
+    window.validateSauceSelection = () => {
+      if (!sauceInput.value) {
+        sauceInput.value = "NO SAUCE";
+      }
+      return true;
+    };
+
+    // Reset sauce selection when opening the popup
+    document.querySelectorAll(".menu-card").forEach(card => {
+      card.addEventListener("click", () => {
+        sauceInput.value = "";
+        sauceButtons.forEach(btn => btn.classList.remove("active"));
+      });
+    });
+  });
+</script>
 </body>
 </html>

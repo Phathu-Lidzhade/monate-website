@@ -232,11 +232,14 @@ body {
   .close-branch:hover {
     opacity: 0.9;
   }
-      /* Cart badge */
-      .cart {
-        position: relative;
-        display: inline-block;
-      }
+  .cart, .orders {
+    position: relative;
+    display: inline-block;
+    margin-left: 15px;
+    font-size: 22px;
+    color: #333;
+    text-decoration: none;
+  }
       .cart-badge {
         position: absolute;
         top: -5px;

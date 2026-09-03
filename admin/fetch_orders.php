@@ -53,13 +53,11 @@ SELECT
   COALESCE(o.total_amount, 0) AS total,
   {$selectStatus}
   o.created_at,
-  CONCAT_WS(', ',
-      NULLIF(o.street, ''),
-      NULLIF(o.building, ''),
-      NULLIF(o.town, ''),
-      NULLIF(o.suburb, ''),
-      NULLIF(o.postal, '')
-  ) AS full_address,
+  o.street,
+  o.building,
+  o.town,
+  o.suburb,
+  o.postal,
   o.instructions
 FROM orders o
 LEFT JOIN users u ON u.id = o.user_id
@@ -71,12 +69,9 @@ $filters = [];
 if ($adminBranch) {
     $branchEsc = $conn->real_escape_string($adminBranch);
     if ($branchColumnOrders) {
-        // orders table has branch column -> filter directly on orders
         $filters[] = "o.`{$branchColumnOrders}` = '{$branchEsc}'";
     } elseif ($branchColumnUsers) {
-        // filter by users.branch if orders doesn't have branch column
         $filters[] = "u.`{$branchColumnUsers}` = '{$branchEsc}'";
-    } else {
     }
 }
 
@@ -103,7 +98,11 @@ while ($row = $result->fetch_assoc()) {
         "total" => number_format($row["total"] ?? 0, 2),
         "status" => $hasStatus ? ($row["status"] ?? "Pending") : null,
         "created_at" => $row["created_at"] ?? null,
-        "address" => $row["full_address"] ?? "",
+        "street" => $row["street"] ?? "",
+        "building" => $row["building"] ?? "",
+        "town" => $row["town"] ?? "",
+        "suburb" => $row["suburb"] ?? "",
+        "postal" => $row["postal"] ?? "",
         "instructions" => $row["instructions"] ?? ""
     ];
 }
@@ -112,4 +111,3 @@ header('Content-Type: application/json');
 echo json_encode($orders);
 
 $conn->close();
-?>

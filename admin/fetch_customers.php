@@ -34,6 +34,8 @@ if (!$branchColumnOrders) {
     }
 }
 
+// Build SQL
+// We will return only users who have placed orders in the admin's branch (if branch info exists).
 $branchEsc = $adminBranch ? $conn->real_escape_string($adminBranch) : null;
 
 if ($adminBranch && $branchColumnOrders) {
@@ -108,4 +110,3 @@ header("Content-Type: application/json");
 echo json_encode($customers);
 
 $conn->close();
-?>

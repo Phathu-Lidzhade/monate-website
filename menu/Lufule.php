@@ -280,8 +280,7 @@ if (isset($_SESSION["user_id"])) {
       });
       window.validateSauceSelection = () => {
         if (!sauceInput.value) {
-          alert("Please select a sauce before adding to cart.");
-          return false;
+          sauceInput.value = "NO SAUCE";
         }
         return true;
       };

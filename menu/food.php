@@ -21,7 +21,7 @@ if (!$item) {
     die("Food item not found.");
 }
 
-// Count items in the cart
+// ✅ Count items in the cart
 $userId = isset($_SESSION["user_id"]) ? $_SESSION["user_id"] : null;
 $sessionId = session_id();
 
@@ -127,6 +127,7 @@ $cartCount = $cartResult->fetch_assoc()["total"] ?? 0;
           <input type="hidden" name="price" value="<?= $item['price'] ?>">
           <input type="hidden" name="img" value="<?= htmlspecialchars($item['image']) ?>">
           <input type="hidden" name="qty" id="qtyInput" value="1">
+          <input type="hidden" name="sauce" value="NO SAUCE">
           <button type="submit" class="add-cart">ADD TO CART</button>
         </form>
       </div>

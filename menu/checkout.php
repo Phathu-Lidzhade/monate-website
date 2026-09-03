@@ -6,10 +6,10 @@ $userId = $_SESSION["user_id"] ?? null;
 $totalItems = 0;
 $totalAmount = 0;
 $cartItems = [];
-$branch = $_GET["branch"] ?? null; // branch passed in URL (e.g. checkout.php?branch=Thohoyandou)
+$branch = $_GET["branch"] ?? null; // ✅ branch passed in URL (e.g. checkout.php?branch=Thohoyandou)
 
 if ($userId && $branch) {
-    // Fetch items for this branch only
+    // ✅ Fetch items for this branch only
     $stmt = $conn->prepare("
         SELECT id, name, price, quantity, branch_location 
         FROM Cart 
@@ -23,7 +23,7 @@ if ($userId && $branch) {
     }
     $stmt->close();
 
-    // Totals only for this branch
+    // ✅ Totals only for this branch
     $stmt = $conn->prepare("
         SELECT SUM(quantity) AS totalItems, SUM(price * quantity) AS totalAmount 
         FROM Cart 
@@ -84,7 +84,7 @@ $deliveryCost = 20; // Default delivery cost
     }
     .checkout-container, .summary-container {
       flex: 1;
-      background: #fff; /* White background only */
+      background: #fff; /* ✅ White background only */
       padding: 2rem;
       border-radius: 10px;
     }
@@ -178,7 +178,7 @@ $deliveryCost = 20; // Default delivery cost
       <h2>Checkout</h2>
       <form action="process_order.php" method="POST" id="checkoutForm">
         
-        <!-- FIXED Hidden Branch -->
+        <!-- ✅ FIXED Hidden Branch -->
         <input type="hidden" name="branch" value="<?= htmlspecialchars($branch) ?>">
 
         <!-- Order Type -->
@@ -219,7 +219,7 @@ $deliveryCost = 20; // Default delivery cost
           <option value="card">Credit/Debit Card</option>
         </select>
 
-        <!-- Pass Total -->
+        <!-- ✅ Pass Total -->
         <input type="hidden" name="baseTotal" value="<?= $totalAmount ?>">
 
         <button type="submit" class="btn">Place Order</button>

@@ -13,7 +13,7 @@ if (!isset($_SESSION["user_id"])) {
 
 $userId = $_SESSION["user_id"];
 
-// Fetch cart items for this user & this branch only
+// ✅ Fetch cart items for this user & this branch only
 $stmt = $conn->prepare("
     SELECT C.id, C.item_id, C.name, C.price, C.quantity, C.sauce, C.image 
     FROM Cart C 

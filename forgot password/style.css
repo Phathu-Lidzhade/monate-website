@@ -96,12 +96,6 @@ input[type="password"] {
 .btn:hover {
     background: #8b2220;
 }
-.signin-link {
-    color: #a92a28;
-    font-weight: bold;
-    text-decoration: none;
-    padding-left: 10%;
-}
 
 @media (max-width: 1024px) {
     .image-side {

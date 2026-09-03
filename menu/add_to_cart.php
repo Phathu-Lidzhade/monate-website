@@ -4,7 +4,7 @@ require_once "../API/db.php";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-    // Get logged-in user ID from session
+    // ✅ Get logged-in user ID from session
     $userId = $_SESSION["user_id"] ?? null;
 
     if (!$userId) {
@@ -13,18 +13,25 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit;
     }
 
-    // Get item data from POST
-    $itemId = $_POST["id"];
-    $itemName = $_POST["name"];
-    $itemPrice = $_POST["price"];
-    $itemQty = $_POST["qty"];
-    $itemSauce = $_POST["sauce"];
-    $itemImg = $_POST["img"];
+    // ✅ Get item data from POST
+    $itemId    = filter_input(INPUT_POST, "id", FILTER_VALIDATE_INT);
+    $itemName  = trim($_POST["name"] ?? "");
+    $itemPrice = filter_input(INPUT_POST, "price", FILTER_VALIDATE_FLOAT);
+    $itemQty   = max(1, min(10, (int) ($_POST["qty"] ?? 1)));
+    $itemSauce = trim($_POST["sauce"] ?? "NO SAUCE");
+    $itemImg   = trim($_POST["img"] ?? "");
 
-    // Insert into Cart (use user_id)
+    if (!$itemId || $itemPrice === false || $itemName === "") {
+        die("Invalid cart item.");
+    }
+
+    // ✅ Force branch to Thohoyandou
+    $branchLocation = "Thohoyandou";
+
+    // ✅ Insert into Cart (use user_id + branch_location)
     $stmt = $conn->prepare("
-        INSERT INTO Cart (user_id, item_id, name, price, quantity, sauce, image) 
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO Cart (user_id, branch_location, item_id, name, price, quantity, sauce, image) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         ON DUPLICATE KEY UPDATE quantity = quantity + VALUES(quantity)
     ");
 
@@ -32,14 +39,25 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         die("Prepare failed: " . $conn->error);
     }
 
-    $stmt->bind_param("iisdiss", $userId, $itemId, $itemName, $itemPrice, $itemQty, $itemSauce, $itemImg);
+    // Types: i=int, s=string, d=double
+    $stmt->bind_param("isisdiss",
+        $userId,
+        $branchLocation,
+        $itemId,
+        $itemName,
+        $itemPrice,
+        $itemQty,
+        $itemSauce,
+        $itemImg
+    );
 
     if (!$stmt->execute()) {
         die("Execute failed: " . $stmt->error);
     }
 
-    // Redirect back with selected item
+    // ✅ Redirect back to Thohoyandou menu
     header("Location: Thohoyandou.php?id=" . urlencode($itemId));
     exit;
 }
 ?>
+

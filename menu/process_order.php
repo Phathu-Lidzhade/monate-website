@@ -8,7 +8,7 @@ if (!isset($_SESSION["user_id"])) {
 
 $userId = $_SESSION["user_id"];
 
-// Branch from POST or GET
+// ✅ Branch from POST or GET
 $branch = $_POST["branch"] ?? ($_GET["branch"] ?? null);
 if (!$branch) {
     die("No branch specified");
@@ -29,7 +29,7 @@ $baseTotal    = $_POST["baseTotal"] ?? 0;
 $deliveryCost = ($orderType === "delivery") ? 20 : 0;
 $totalAmount  = $baseTotal + $deliveryCost + $tip;
 
-// Insert into orders
+// ✅ Insert into orders
 $stmt = $conn->prepare("
     INSERT INTO orders (
         user_id, branch_location, order_type, street, building, town, suburb, postal, 
@@ -45,7 +45,7 @@ $stmt->execute();
 $orderId = $stmt->insert_id;
 $stmt->close();
 
-// Fetch cart items for this user & branch
+// ✅ Fetch cart items for this user & branch
 $stmt = $conn->prepare("
     SELECT item_id, name, price, quantity, sauce, image
     FROM Cart 
@@ -69,7 +69,7 @@ while ($row = $result->fetch_assoc()) {
 }
 $stmt->close();
 
-// Clear cart
+// ✅ Clear cart
 $deleteStmt = $conn->prepare("DELETE FROM Cart WHERE user_id = ? AND branch_location = ?");
 $deleteStmt->bind_param("is", $userId, $branch);
 $deleteStmt->execute();

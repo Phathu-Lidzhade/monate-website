@@ -24,12 +24,10 @@ body {
   z-index: 1000;
 }
 
-/* Logo */
 .logo img {
   height: 80px;
 }
 
-/* Nav links */
 .nav-links {
   display: flex;
   gap: 2rem;
@@ -43,7 +41,6 @@ body {
   font-weight: 400;
 }
 
-/* Account & cart */
 .account-cart {
   display: flex;
   align-items: center;
@@ -70,6 +67,42 @@ body {
   width: 1px;
   height: 20px;
   background: black;
+}
+
+/* Account dropdown */
+.account-dropdown {
+  display: none;
+  position: absolute;
+  right: 0;
+  background: #fff;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+  padding: 10px;
+  border-radius: 8px;
+  z-index: 10;
+  min-width: 180px;
+}
+
+.account-container {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.account-dropdown p {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #333;
+}
+
+.account-dropdown a {
+  display: block;
+  background: red;
+  color: white;
+  text-align: center;
+  padding: 6px;
+  text-decoration: none;
+  border-radius: 4px;
+  margin-top: 5px;
 }
 
 /* Story */

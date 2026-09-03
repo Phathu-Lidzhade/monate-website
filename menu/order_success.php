@@ -110,7 +110,7 @@ if (!$orderId || !isset($_SESSION['user_id'])) {
     <p><?= $errorMessage ?? "Order ID not found." ?></p>
   <?php endif; ?>
 
-  <a href="../HOME/index.php" class="btn-home">Go back to Home</a>
+  <a href="orders.php" class="btn-home">view your orders</a>
 </main>
 </body>
 </html>

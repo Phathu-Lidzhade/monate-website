@@ -1,6 +1,56 @@
 <?php
-// run controller first so it can set $message
-require_once __DIR__ . '/includes/control.php';
+// Start session so we can log in the user after registration
+session_start();
+
+// Include DB connection
+include("../API/db.php");
+
+// Initialize message
+$message = "";
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $username = $_POST["username"];
+    $email = $_POST["email"];
+    $mobile = $_POST["mobile"];
+    $day = $_POST["day"];
+    $month = $_POST["month"];
+    $year = $_POST["year"];
+    $dob = "$year-$month-$day"; // format YYYY-MM-DD
+    $password = $_POST["password"];
+    $confirm_password = $_POST["confirm_password"];
+
+    // Password check
+    if ($password !== $confirm_password) {
+        $message = "Passwords do not match!";
+    } else {
+        // Hash password
+        $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+
+        // Insert user into database
+        $sql = "INSERT INTO users (username, email, mobile, dob, password) VALUES (?, ?, ?, ?, ?)";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("sssss", $username, $email, $mobile, $dob, $hashedPassword);
+
+        if ($stmt->execute()) {
+            // ✅ Account created successfully → log in user immediately
+            $userId = $stmt->insert_id;
+
+            $_SESSION["user_id"] = $userId;
+            $_SESSION["username"] = $username;
+            $_SESSION["email"] = $email;
+            $_SESSION["role"] = "user";
+
+            // Redirect to homepage
+            header("Location: ../HOME/index.php");
+            exit();
+        } else {
+            $message = "Error: " . $stmt->error;
+        }
+
+        $stmt->close();
+        $conn->close();
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -22,8 +72,10 @@ require_once __DIR__ . '/includes/control.php';
 
             <h1>Create Account</h1>
 
-            <!-- Show message (view) -->
-            <?php require_once __DIR__ . '/includes/view.php'; ?>
+           <!-- Show message -->
+            <?php if (!empty($message)) { ?>
+                <p style="color:red;"><?php echo $message; ?></p>
+            <?php } ?>
 
             <form class="form" method="POST" action="">
                 <input type="text" name="username" placeholder="Username" required>
@@ -51,7 +103,7 @@ require_once __DIR__ . '/includes/control.php';
 
             <p class="signin-text">
                 Already have an account?
-                <a href="../sign in/index.php" class="signin-link">Sign in</a>
+                <a href="../Sign in/index.php" class="signin-link">Sign in</a>
             </p>
         </div>
     </div>

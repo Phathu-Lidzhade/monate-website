@@ -1,6 +1,50 @@
 <?php
-// run controller first so it can set $message
-require_once __DIR__ . '/includes/control.php';
+// Include DB connection
+include("../API/db.php");
+
+$message = "";
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $email = $_POST["email"];
+    $mobile = $_POST["mobile"];   // changed from phone → mobile
+    $password = $_POST["password"];
+    $confirm_password = $_POST["confirm_password"];
+
+    // Check passwords
+    if ($password !== $confirm_password) {
+        $message = "Passwords do not match!";
+    } else {
+        // Check if user exists
+        $sql = "SELECT * FROM users WHERE email = ? AND mobile = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ss", $email, $mobile);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows === 1) {
+            // Hash new password
+            $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+
+            // Update password
+            $updateSql = "UPDATE users SET password = ? WHERE email = ? AND mobile = ?";
+            $updateStmt = $conn->prepare($updateSql);
+            $updateStmt->bind_param("sss", $hashedPassword, $email, $mobile);
+
+            if ($updateStmt->execute()) {
+                $message = "Password updated successfully!";
+            } else {
+                $message = "Error updating password!";
+            }
+
+            $updateStmt->close();
+        } else {
+            $message = "No account found with that email and mobile number!";
+        }
+
+        $stmt->close();
+        $conn->close();
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -26,8 +70,10 @@ require_once __DIR__ . '/includes/control.php';
                 <h1>Forgot Password</h1>
                 <p class="subtitle">Enter your details to reset your password.</p>
 
-                <!-- Show message (view) -->
-                <?php require_once __DIR__ . '/includes/view.php'; ?>
+                <!-- Show message -->
+                <?php if (!empty($message)) { ?>
+                    <p style="color:red;"><?php echo $message; ?></p>
+                <?php } ?>
 
                 <form class="form" method="POST" action="">
                     <input type="email" name="email" placeholder="Email Address" required>
@@ -37,7 +83,6 @@ require_once __DIR__ . '/includes/control.php';
 
                     <button type="submit" class="btn">Change Password</button>
                 </form>
-                <a href="../sign in/index.php" class="signin-link">Back to Sign in</a>
             </div>
         </div>
     </div>

@@ -2,7 +2,7 @@
 session_start();
 // Check if admin is logged in 
 if (!isset($_SESSION["role"]) || $_SESSION["role"] !== "admin") {
-    header("Location: ../home/index.php");
+    header("Location: ../login/index.php");
     exit();
 }
 

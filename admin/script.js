@@ -73,7 +73,8 @@ function renderOrders() {
                         <th>Customer</th>
                         <th>Item(s)</th>
                         <th>Total (R)</th>
-                        <th>Address & Instructions</th>
+                        <th>Address</th>
+                        <th>Instructions</th>
                         <th>Status</th>
                         <th>Created At</th>
                     </tr>
@@ -91,16 +92,18 @@ function loadOrders() {
             const tbody = document.getElementById("ordersBody");
             tbody.innerHTML = "";
             data.forEach(o => {
+                const fullAddress = [o.street, o.building, o.town, o.suburb, o.postal]
+                    .filter(v => v && v.trim() !== "")
+                    .join(", ");
+
                 tbody.innerHTML += `
                     <tr>
                         <td>${o.id}</td>
                         <td>${o.customer}</td>
                         <td>${o.items}</td>
                         <td>${o.total}</td>
-                        <td>
-                            ${o.address ? `<div><strong>Address:</strong> ${o.address}</div>` : ""}
-                            ${o.instructions ? `<div><strong>Note:</strong> ${o.instructions}</div>` : ""}
-                        </td>
+                        <td>${fullAddress || ""}</td>
+                        <td>${o.instructions || ""}</td>
                         <td>
                             <div class="status-cell">
                                 <span class="badge ${statusClass(o.status)} js-status">${o.status}</span>
@@ -119,6 +122,7 @@ function loadOrders() {
         })
         .catch(err => console.error("Error loading orders:", err));
 }
+
 
 function statusClass(value) {
     const map = {
