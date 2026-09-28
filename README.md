@@ -319,9 +319,10 @@ This project was developed as a practical full-stack web development project for
 
 ---
 
-## 👨‍💻 Author
+## 👨‍💻 Authors
 
 **Phathutshedzo Lidzhade**
+**Akonaho Mbedzi and other students**
 
 Computer Science Graduate
 
